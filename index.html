@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ selected_source }} News - Project</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        :root {
+            --bg: #f4f7f9;
+            --text: #333;
+            --card: white;
+            --link: #2980b9;
+            --link-hover: #1a5276;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark {
+            --bg: #121212;
+            --text: #f4f4f4;
+            --card: #1f1f1f;
+            --link: #90caf9;
+            --link-hover: #64b5f6;
+            --shadow: rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 28px;
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 3px solid var(--link);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .source-menu {
+            text-align: center;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        .source-menu a, .source-menu strong {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--link);
+            margin: 0 10px;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .source-menu a:hover {
+            background-color: #d6e9ff;
+        }
+
+        .source-menu strong {
+            color: var(--text);
+            cursor: default;
+            background-color: #d6e9ff;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        form input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 12px;
+            font-size: 1rem;
+            border: 1.5px solid var(--link);
+            border-radius: 4px;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        form select {
+            padding: 10px 12px;
+            font-size: 1rem;
+            border: 1.5px solid var(--link);
+            border-radius: 4px;
+            background: var(--card);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        form input[type="text"]:focus, form select:focus {
+            outline: none;
+            border-color: var(--link-hover);
+            background-color: #e8f0fe;
+        }
+
+        form button {
+            background-color: var(--link);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        form button:hover {
+            background-color: var(--link-hover);
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        ul li {
+            background-color: var(--card);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px var(--shadow);
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            align-items: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        ul li:hover {
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        ul li img {
+            width: 200px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        ul li div.article-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        ul li a {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--link);
+            text-decoration: none;
+            display: block;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        ul li small {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+            flex-wrap: wrap;
+            user-select: none;
+        }
+
+        .pagination a, .pagination strong {
+            background-color: var(--link);
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .pagination a:hover {
+            background-color: var(--link-hover);
+        }
+
+        .pagination strong {
+            background-color: var(--link-hover);
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .top-buttons button {
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--link);
+            color: white;
+            font-weight: 600;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .top-buttons button:hover,
+        .top-buttons button:active {
+            background-color: var(--link-hover);
+        }
+
+        ul li button.bookmark-btn {
+            align-self: flex-start;
+            background-color: var(--link);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        ul li button.bookmark-btn:hover,
+        ul li button.bookmark-btn:active {
+            background-color: var(--link-hover);
+        }
+
+        /* Modal styles for favorites */
+        #favoritesModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #favoritesModal .modal-content {
+            background: var(--card);
+            color: var(--text);
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #favoritesModal h2 {
+            margin-top: 0;
+        }
+
+        #favoritesModal ul {
+            max-width: 100%;
+        }
+
+        #favoritesModal ul li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--shadow);
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        #favoritesModal ul li a {
+            font-size: 1rem;
+            color: var(--link);
+            font-weight: 600;
+            text-decoration: none;
+            flex-grow: 1;
+        }
+
+        #favoritesModal ul li button {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        #favoritesModal ul li button:hover {
+            background-color: #c0392b;
+        }
+
+        #favoritesModal .close-btn {
+            align-self: flex-end;
+            background-color: var(--link);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        #favoritesModal .close-btn:hover {
+            background-color: var(--link-hover);
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 22px; margin-bottom: 18px; }
+            form { flex-direction: column; }
+            form input[type="text"], form button, form select { width: 100%; }
+            ul li { padding: 12px 15px; flex-direction: column; align-items: flex-start; }
+            ul li img { width: 100%; height: auto; border-radius: 6px; }
+            ul li div.article-info { width: 100%; }
+            ul li button.bookmark-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo">NP Project Sohail Ezzat and Faizan</div>
+
+    <div class="top-buttons">
+        <button onclick="toggleDarkMode()" aria-label="Toggle dark mode">Toggle Dark Mode</button>
+        <button id="showFavoritesBtn" aria-label="Show favorite bookmarked articles">Show Favorites</button>
+    </div>
+
+    <h1>News from {{ selected_source }}</h1>
+
+    <div class="source-menu" role="navigation" aria-label="News source selection">
+        {% for source in sources %}
+            {% if source == selected_source %}
+                <strong aria-current="page">{{ source }}</strong>
+            {% else %}
+                <a href="/?source={{ source }}&category={{ selected_category }}">{{ source }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <form method="get" action="/" role="search" aria-label="Search articles form">
+        <input type="text" name="q" placeholder="Search articles..." value="{{ query }}" aria-label="Search articles" />
+        <select name="category" aria-label="Select category">
+          <option value="" {% if not selected_category %}selected{% endif %}>All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="source" value="{{ selected_source }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <ul id="articleList" aria-live="polite">
+    {% for article in articles %}
+        <li>
+            <img src="{{ article.image_url }}" alt="Image for {{ article.title }}" />
+            <div class="article-info">
+                <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer">{{ article.title }}</a>
+                <small><em>{{ article.published }}</em></small>
+            </div>
+            <button class="bookmark-btn" aria-label="Bookmark article titled {{ article.title }}" data-title="{{ article.title }}" data-link="{{ article.link }}">⭐ Bookmark</button>
+        </li>
+    {% endfor %}
+    </ul>
+
+    {% if total_pages > 1 %}
+    <div class="pagination" role="navigation" aria-label="Pagination navigation">
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <strong aria-current="page">{{ p }}</strong>
+            {% else %}
+                <a href="/?source={{ selected_source }}&category={{ selected_category }}&q={{ query }}&page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Favorites Modal -->
+    <div id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle" tabindex="-1">
+        <div class="modal-content">
+            <h2 id="favoritesTitle">Favorite Articles</h2>
+            <ul id="favoritesList"></ul>
+            <button class="close-btn" aria-label="Close favorites modal">Close</button>
+        </div>
+    </div>
+
+<script>
+    // Dark mode toggle with persistence
+    const body = document.body;
+    const darkModeStorageKey = 'newsDarkMode';
+
+    function applyDarkMode(isDark) {
+        if (isDark) {
+            body.classList.add('dark');
+        } else {
+            body.classList.remove('dark');
+        }
+    }
+
+    function toggleDarkMode() {
+        const isDark = !body.classList.contains('dark');
+        applyDarkMode(isDark);
+        localStorage.setItem(darkModeStorageKey, isDark);
+    }
+
+    // Load dark mode state from localStorage on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const storedDarkMode = localStorage.getItem(darkModeStorageKey);
+        if (storedDarkMode === 'true') {
+            applyDarkMode(true);
+        }
+    });
+
+    // Bookmarking feature
+    const bookmarkButtons = document.querySelectorAll('button.bookmark-btn');
+    const favoritesKey = 'newsFavorites';
+
+    // Load favorites from localStorage
+    function loadFavorites() {
+        const favStr = localStorage.getItem(favoritesKey);
+        return favStr ? JSON.parse(favStr) : [];
+    }
+
+    // Save favorites to localStorage
+    function saveFavorites(favs) {
+        localStorage.setItem(favoritesKey, JSON.stringify(favs));
+    }
+
+    // Add a favorite article if not already in favorites
+    function addFavorite(article) {
+        const favs = loadFavorites();
+        if (!favs.some(a => a.link === article.link)) {
+            favs.push(article);
+            saveFavorites(favs);
+            alert(`Added "${article.title}" to favorites.`);
+        } else {
+            alert(`"${article.title}" is already in favorites.`);
+        }
+    }
+
+    bookmarkButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const article = {
+                title: btn.getAttribute('data-title'),
+                link: btn.getAttribute('data-link')
+            };
+            addFavorite(article);
+        });
+    });
+
+    // Favorites modal logic
+    const favoritesModal = document.getElementById('favoritesModal');
+    const favoritesList = document.getElementById('favoritesList');
+    const showFavoritesBtn = document.getElementById('showFavoritesBtn');
+    const closeFavoritesBtn = favoritesModal.querySelector('.close-btn');
+
+    function renderFavorites() {
+        const favs = loadFavorites();
+        favoritesList.innerHTML = '';
+
+        if (favs.length === 0) {
+            favoritesList.innerHTML = '<li>No favorites saved yet.</li>';
+            return;
+        }
+
+        favs.forEach((fav, index) => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = fav.link;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = fav.title;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = 'Remove';
+            removeBtn.setAttribute('aria-label', `Remove favorite article titled ${fav.title}`);
+            removeBtn.addEventListener('click', () => {
+                removeFavorite(index);
+            });
+
+            li.appendChild(link);
+            li.appendChild(removeBtn);
+            favoritesList.appendChild(li);
+        });
+    }
+
+    function removeFavorite(index) {
+        const favs = loadFavorites();
+        favs.splice(index, 1);
+        saveFavorites(favs);
+        renderFavorites();
+    }
+
+    showFavoritesBtn.addEventListener('click', () => {
+        renderFavorites();
+        favoritesModal.style.display = 'flex';
+        favoritesModal.focus();
+    });
+
+    closeFavoritesBtn.addEventListener('click', () => {
+        favoritesModal.style.display = 'none';
+    });
+
+    // Close modal on outside click or ESC key
+    favoritesModal.addEventListener('click', (e) => {
+        if (e.target === favoritesModal) {
+            favoritesModal.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && favoritesModal.style.display === 'flex') {
+            favoritesModal.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
