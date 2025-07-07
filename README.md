@@ -21,5 +21,8 @@ bash
 Copy
 Edit
 ngrok http 5000
+homepage ![image](https://github.com/user-attachments/assets/076f5b20-971b-43c0-8e58-70278ae40c48)
+bookmark favourites ![image](https://github.com/user-attachments/assets/d84bf1e3-8855-4608-9bab-6c935927cfc4)
+
 
 
